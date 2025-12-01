@@ -1,0 +1,29 @@
+@model IEnumerable<JobBoard.Models.Job>
+
+<div id="job-list" class="row">
+    @foreach (var job in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@job.Title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@job.Company</h6>
+                    <p class="card-text">@job.Description.Substring(0, Math.Min(job.Description.Length, 100))...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">@job.Location</small>
+                        <span class="badge bg-primary">@job.Type</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                     <a href="/Details?id=@job.Id" class="btn btn-outline-primary w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center">
+            <p class="text-muted">No jobs found.</p>
+        </div>
+    }
+</div>

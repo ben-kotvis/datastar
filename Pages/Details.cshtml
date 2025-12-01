@@ -1,0 +1,38 @@
+@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Job Details";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2>@Model.Job.Title</h2>
+            <h4 class="mb-0">@Model.Job.Company</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong>Location:</strong> @Model.Job.Location
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <strong>Posted:</strong> @Model.Job.PostedDate.ToShortDateString()
+                </div>
+            </div>
+            <div class="row mb-3">
+                 <div class="col-md-6">
+                    <strong>Type:</strong> <span class="badge bg-info text-dark">@Model.Job.Type</span>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <strong>Salary:</strong> @Model.Job.SalaryRange
+                </div>
+            </div>
+            <hr />
+            <p class="card-text lead">@Model.Job.Description</p>
+        </div>
+        <div class="card-footer">
+            <a asp-page="/Index" class="btn btn-secondary">Back to Jobs</a>
+            <a asp-page="/Applicant" class="btn btn-success float-end">Apply Now</a>
+        </div>
+    </div>
+</div>

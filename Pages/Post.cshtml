@@ -1,0 +1,43 @@
+@page
+@model PostModel
+@{
+    ViewData["Title"] = "Post a Job";
+}
+
+<div class="container mt-5">
+    <h1>Post a New Job</h1>
+    <div id="post-form-container" data-store="{ title: '', company: '', location: '', description: '', type: 'Full-time', salaryRange: '' }">
+        <form id="post-form" data-on:submit="@@post('/Post?handler=Submit', {contentType:'form'})" >
+        @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label">Job Title</label>
+                <input type="text" class="form-control" name="title" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Company</label>
+                <input type="text" class="form-control" name="company" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" name="location" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Type</label>
+                <select class="form-select" name="type">
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Salary Range</label>
+                <input type="text" class="form-control" name="salaryRange" placeholder="e.g. $100k - $120k" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" rows="5" name="description"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Job</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+C:\Users\ben\source\datastar\JobBoard\Pages\Index.cshtml(15,40): error CS1012: Too many characters in character literal [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Post.cshtml(10,37): error CS1012: Too many characters in character literal [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Details.cshtml.cs(12,16): warning CS8618: Non-nullable property 'Job' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Details.cshtml.cs(21,19): warning CS8601: Possible null reference assignment. [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Index.cshtml(15,36): error CS0103: The name 'get' does not exist in the current context [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Post.cshtml(10,32): error CS0103: The name 'post' does not exist in the current context [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Shared\_Layout.cshtml(7,62): error CS0103: The name 'starfederation' does not exist in the current context [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+
+Build FAILED.
+
+C:\Users\ben\source\datastar\JobBoard\Pages\Details.cshtml.cs(12,16): warning CS8618: Non-nullable property 'Job' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Details.cshtml.cs(21,19): warning CS8601: Possible null reference assignment. [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Index.cshtml(15,40): error CS1012: Too many characters in character literal [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Post.cshtml(10,37): error CS1012: Too many characters in character literal [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Index.cshtml(15,36): error CS0103: The name 'get' does not exist in the current context [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Post.cshtml(10,32): error CS0103: The name 'post' does not exist in the current context [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+C:\Users\ben\source\datastar\JobBoard\Pages\Shared\_Layout.cshtml(7,62): error CS0103: The name 'starfederation' does not exist in the current context [C:\Users\ben\source\datastar\JobBoard\JobBoard.csproj]
+    2 Warning(s)
+    5 Error(s)
+
+Time Elapsed 00:00:01.04
