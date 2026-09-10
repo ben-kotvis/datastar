@@ -4,15 +4,15 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center mb-5" data-store="{ query: '' }">
+<div class="text-center mb-5" data-signals:query="''">
     <h1 class="display-4 mb-3">Find Your Dream Job</h1>
     <div class="row justify-content-center">
         <div class="col-md-6">
             <input type="text" 
                    class="form-control form-control-lg" 
                    placeholder="Search jobs by title, company, or location..." 
-                   data-model="query"
-                   data-on:input="@@get('/Index?handler=Search')" />
+                   data-bind:query
+                   data-on:input__debounce.300ms="@@get('/Index?handler=Search')" />
         </div>
     </div>
 </div>

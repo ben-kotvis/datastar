@@ -1,0 +1,20 @@
+@using JobBoard.Helpers
+@model IReadOnlyList<JobBoard.Models.WisconsinPlace>
+
+<div id="wx-suggestions" class="wx-suggestions">
+    @if (Model.Count == 0)
+    {
+        <p class="wx-suggest-empty">No Wisconsin place by that name.</p>
+    }
+    else
+    {
+        @foreach (var place in Model)
+        {
+            <button type="button" class="wx-suggestion"
+                    data-on:click="$lat = @ViewHelpers.Js(place.Latitude); $lon = @ViewHelpers.Js(place.Longitude); $label = @ViewHelpers.Js(place.Display); $query = ''; @@get('/Weather?handler=Point')">
+                <span class="wx-suggestion-name">@place.Name</span>
+                <span class="wx-suggestion-county">@place.County County</span>
+            </button>
+        }
+    }
+</div>

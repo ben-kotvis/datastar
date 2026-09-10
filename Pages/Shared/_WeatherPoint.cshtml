@@ -1,0 +1,208 @@
+@using JobBoard.Helpers
+@model JobBoard.Models.PointPanel
+@{
+    var forecast = Model.Forecast;
+    var current = forecast?.Current;
+    var trend = forecast is null ? null : Sparkline.From(forecast.Hourly);
+}
+
+@* The panel re-asserts the point it is describing, so a server-chosen location - "Surprise me",
+   or a coordinate the NWS resolved to a named town - moves the map marker and updates the header
+   without the server ever patching a signal directly. *@
+<div id="wx-point" class="wx-point"
+     data-signals:lat="@ViewHelpers.Js(Model.Point.Latitude)"
+     data-signals:lon="@ViewHelpers.Js(Model.Point.Longitude)"
+     data-signals:label="@ViewHelpers.Js(Model.Label)">
+
+    <div class="wx-point-head">
+        <h2 class="wx-place">@Model.Label</h2>
+        <p class="wx-where">
+            @if (!string.IsNullOrEmpty(Model.CountyName))
+            {
+                <span class="wx-county-name">@Model.CountyName County</span>
+                <span class="wx-dot" aria-hidden="true">&middot;</span>
+            }
+            <span class="wx-latlon">@Model.Point.ToString()</span>
+        </p>
+    </div>
+
+    @if (Model.Error is not null)
+    {
+        <p class="wx-error @(Model.OutsideWisconsin ? "is-outside" : "")">@Model.Error</p>
+    }
+    else if (forecast is not null)
+    {
+        <div class="wx-now">
+            @if (current?.Temperature is not null)
+            {
+                <div class="wx-now-temp">
+                    <span class="u-f">@current.Temperature.F</span><span class="u-c">@current.Temperature.C</span>
+                </div>
+            }
+            else
+            {
+                <div class="wx-now-temp is-missing" title="No station nearby is reporting a temperature">&ndash;&ndash;</div>
+            }
+
+            <div class="wx-now-detail">
+                @if (current is not null)
+                {
+                    <p class="wx-now-summary">@(string.IsNullOrEmpty(current.Summary) ? "Conditions reported" : current.Summary)</p>
+                    <p class="wx-now-station">
+                        @current.StationName (@current.StationId) &middot; @ViewHelpers.Ago(current.ObservedAt)
+                    </p>
+                }
+                else
+                {
+                    <p class="wx-now-summary">No current observation</p>
+                    <p class="wx-now-station">The nearest reporting stations are quiet right now.</p>
+                }
+            </div>
+        </div>
+
+        @if (current is not null)
+        {
+            <dl class="wx-facts">
+                @if (current.FeelsLike is not null)
+                {
+                    <div>
+                        <dt>Feels like</dt>
+                        <dd><span class="u-f">@current.FeelsLike.F</span><span class="u-c">@current.FeelsLike.C</span></dd>
+                    </div>
+                }
+                @if (current.Wind is not null)
+                {
+                    <div>
+                        <dt>Wind</dt>
+                        <dd>
+                            <span class="u-f">@current.Wind.Imperial</span><span class="u-c">@current.Wind.Metric</span>
+                            @if (current.WindCompass is not null)
+                            {
+                                <span class="wx-compass">@current.WindCompass</span>
+                            }
+                        </dd>
+                    </div>
+                }
+                @if (current.WindGust is not null)
+                {
+                    <div>
+                        <dt>Gusting</dt>
+                        <dd><span class="u-f">@current.WindGust.Imperial</span><span class="u-c">@current.WindGust.Metric</span></dd>
+                    </div>
+                }
+                @if (current.DewPoint is not null)
+                {
+                    <div>
+                        <dt>Dew point</dt>
+                        <dd><span class="u-f">@current.DewPoint.F</span><span class="u-c">@current.DewPoint.C</span></dd>
+                    </div>
+                }
+                @if (current.Humidity is not null)
+                {
+                    <div>
+                        <dt>Humidity</dt>
+                        <dd>@current.Humidity</dd>
+                    </div>
+                }
+                @if (current.Pressure is not null)
+                {
+                    <div>
+                        <dt>Pressure</dt>
+                        <dd>@current.Pressure</dd>
+                    </div>
+                }
+                @if (current.Visibility is not null)
+                {
+                    <div>
+                        <dt>Visibility</dt>
+                        <dd>@current.Visibility</dd>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(forecast.RadarStation))
+                {
+                    <div>
+                        <dt>Radar</dt>
+                        <dd>@forecast.RadarStation</dd>
+                    </div>
+                }
+            </dl>
+        }
+
+        @if (forecast.Alerts.Count > 0)
+        {
+            <ul class="wx-point-alerts">
+                @foreach (var alert in forecast.Alerts)
+                {
+                    <li class="wx-point-alert is-@alert.Kind">
+                        <strong>@alert.Event</strong>
+                        @if (alert.Ends is not null)
+                        {
+                            <span class="wx-until">until @ViewHelpers.LocalTime(alert.Ends, forecast.TimeZone)</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (trend is not null)
+        {
+            <div class="wx-trend">
+                <div class="wx-trend-head">
+                    <span>Next @forecast.Hourly.Count hours</span>
+                    <span class="wx-trend-range">
+                        <span class="u-f">@trend.LowF &ndash; @trend.HighF</span><span class="u-c">@trend.LowC &ndash; @trend.HighC</span>
+                    </span>
+                </div>
+                <svg class="wx-spark" viewBox="0 0 @trend.Width @trend.Height" role="img"
+                     aria-label="Hourly temperature trend from @trend.FirstHour to @trend.LastHour, ranging @trend.LowF to @trend.HighF">
+                    <polygon class="wx-spark-fill" points="@trend.Area"></polygon>
+                    <polyline class="wx-spark-line" points="@trend.Line"></polyline>
+                </svg>
+                <div class="wx-trend-foot">
+                    <span>@trend.FirstHour</span>
+                    <span>@trend.LastHour</span>
+                </div>
+            </div>
+        }
+
+        @if (forecast.Periods.Count > 0)
+        {
+            <ol class="wx-periods">
+                @foreach (var period in forecast.Periods.Take(6))
+                {
+                    <li class="wx-period @(period.IsDaytime ? "is-day" : "is-night")">
+                        <div class="wx-period-head">
+                            <span class="wx-period-name">@period.Name</span>
+                            @if (period.Temperature is not null)
+                            {
+                                <span class="wx-period-temp">
+                                    <span class="u-f">@period.Temperature.F</span><span class="u-c">@period.Temperature.C</span>
+                                </span>
+                            }
+                        </div>
+                        <p class="wx-period-short">@period.ShortForecast</p>
+                        <p class="wx-period-meta">
+                            @if (period.PrecipitationChance is > 0)
+                            {
+                                <span class="wx-precip">@period.PrecipitationChance% precip</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(period.Wind))
+                            {
+                                <span class="wx-windmeta">@period.Wind</span>
+                            }
+                        </p>
+                    </li>
+                }
+            </ol>
+        }
+
+        <p class="wx-point-foot">
+            NWS grid @forecast.GridId
+            @if (!string.IsNullOrEmpty(forecast.TimeZone))
+            {
+                <text>&middot; local time @ViewHelpers.LocalTime(DateTimeOffset.Now, forecast.TimeZone)</text>
+            }
+            &middot; fetched @ViewHelpers.Ago(forecast.RetrievedAt)
+        </p>
+    }
+</div>

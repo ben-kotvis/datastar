@@ -1,0 +1,64 @@
+@using JobBoard.Helpers
+@model JobBoard.Models.StatewideSnapshot
+@{
+    var warmest = Model.Warmest;
+    var coldest = Model.Coldest;
+}
+
+<div id="wx-ribbon" class="wx-ribbon" aria-live="polite">
+    <div class="wx-ribbon-meta">
+        <span class="wx-pulse is-live" aria-hidden="true"></span>
+        <span class="wx-ribbon-label">Live across Wisconsin</span>
+        <span class="wx-ribbon-time">@ViewHelpers.LocalTime(Model.RetrievedAt)</span>
+        @if (Model.SpreadFahrenheit is { } spread && warmest is not null && coldest is not null)
+        {
+            <span class="wx-ribbon-spread">
+                @Math.Round(spread)&deg; between @warmest.Label and @coldest.Label
+            </span>
+        }
+    </div>
+
+    @if (Model.Error is not null)
+    {
+        <p class="wx-ribbon-error">@Model.Error</p>
+    }
+
+    <div class="wx-chips">
+        @foreach (var station in Model.Stations)
+        {
+            var temperature = station.Current?.Temperature;
+            var classes = "wx-chip"
+                + (temperature is not null && station.StationId == warmest?.StationId ? " is-warmest" : string.Empty)
+                + (temperature is not null && station.StationId == coldest?.StationId ? " is-coldest" : string.Empty);
+
+            if (station.Point is not null)
+            {
+                <button type="button" class="@classes"
+                        data-on:click="$lat = @ViewHelpers.Js(station.Point.Latitude); $lon = @ViewHelpers.Js(station.Point.Longitude); $label = @ViewHelpers.Js(station.Label); $query = ''; @@get('/Weather?handler=Point')">
+                    <span class="wx-chip-city">@station.Label</span>
+                    @if (temperature is not null)
+                    {
+                        <span class="wx-chip-temp">
+                            <span class="u-f">@temperature.F</span><span class="u-c">@temperature.C</span>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="wx-chip-temp is-missing" title="@station.StationId is not reporting">&ndash;&ndash;</span>
+                    }
+                    @if (station.Current is not null && !string.IsNullOrEmpty(station.Current.Summary))
+                    {
+                        <span class="wx-chip-sky">@station.Current.Summary</span>
+                    }
+                </button>
+            }
+            else
+            {
+                <div class="@classes">
+                    <span class="wx-chip-city">@station.Label</span>
+                    <span class="wx-chip-temp is-missing">&ndash;&ndash;</span>
+                </div>
+            }
+        }
+    </div>
+</div>

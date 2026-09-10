@@ -1,0 +1,37 @@
+@using JobBoard.Helpers
+@model JobBoard.Models.AlertBanner
+
+@* Publishing the flagged counties as a signal is what re-colours the map: every county path
+   watches $alertFips, so one patched attribute repaints all 72 of them. *@
+<div id="wx-alerts" class="wx-alerts @(Model.Alerts.Count > 0 ? "is-active" : "is-quiet")"
+     aria-live="polite"
+     data-signals:alert-fips="@ViewHelpers.Js(Model.CountyFipsList)">
+    @if (Model.Alerts.Count == 0)
+    {
+        <span class="wx-alerts-quiet">No active watches, warnings or advisories in Wisconsin.</span>
+    }
+    else
+    {
+        <span class="wx-alerts-count">
+            @Model.Alerts.Count active @(Model.Alerts.Count == 1 ? "alert" : "alerts")
+        </span>
+        <ul class="wx-alerts-list">
+            @foreach (var group in Model.Alerts
+                .GroupBy(item => item.Event, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(item => item.Count())
+                .Take(6))
+            {
+                var first = group.First();
+                var count = group.Count();
+                <li class="wx-alert is-@first.Kind">
+                    <span class="wx-alert-event">@group.Key</span>
+                    @if (count > 1)
+                    {
+                        <span class="wx-alert-times">&times;@count</span>
+                    }
+                    <span class="wx-alert-area">@first.AreaDescription</span>
+                </li>
+            }
+        </ul>
+    }
+</div>

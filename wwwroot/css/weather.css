@@ -1,0 +1,644 @@
+/* Wisconsin Weather - self-contained styles for Pages/Weather.cshtml.
+   Everything is scoped under .wx so the page looks the same whether or not the Bootstrap
+   bundle in wwwroot/lib has been restored. */
+
+.wx {
+    --wx-ink: #0f172a;
+    --wx-muted: #64748b;
+    --wx-line: #e2e8f0;
+    --wx-card: #ffffff;
+    --wx-shell: #f6f8fb;
+    --wx-accent: #0b6fa4;
+    --wx-accent-soft: #e6f2f9;
+    --wx-warm: #c2410c;
+    --wx-cold: #1d4ed8;
+    --wx-flag: #f59f0b;
+    --wx-land: #dfe7ee;
+    --wx-land-line: #ffffff;
+    --wx-water: #eef4f8;
+
+    color: var(--wx-ink);
+    background: var(--wx-shell);
+    border: 1px solid var(--wx-line);
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem 0.75rem;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+/* --- unit switching -------------------------------------------------------
+   Both readings are always in the markup; the root class decides which one is
+   visible, so flipping between F and C never touches the network. */
+.wx .u-c { display: none; }
+.wx.units-c .u-f { display: none; }
+.wx.units-c .u-c { display: inline; }
+
+.wx-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --- header --------------------------------------------------------------- */
+.wx-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.wx-title {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.wx-sub {
+    margin: 0.3rem 0 0;
+    max-width: 46ch;
+    color: var(--wx-muted);
+}
+
+.wx-head-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.wx-coords {
+    text-align: right;
+    line-height: 1.2;
+}
+
+.wx-coords-label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--wx-muted);
+}
+
+.wx-coords-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.wx-units {
+    display: inline-flex;
+    border: 1px solid var(--wx-line);
+    border-radius: 999px;
+    background: var(--wx-card);
+    overflow: hidden;
+}
+
+.wx-units button {
+    border: 0;
+    background: transparent;
+    color: var(--wx-muted);
+    padding: 0.35rem 0.8rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wx-units button.on {
+    background: var(--wx-accent);
+    color: #fff;
+}
+
+/* --- live ribbon and alerts ---------------------------------------------- */
+.wx-live {
+    margin-top: 1rem;
+}
+
+.wx-alerts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid var(--wx-line);
+    background: var(--wx-card);
+    font-size: 0.85rem;
+}
+
+.wx-alerts.is-active {
+    border-color: #f8d38a;
+    background: #fff9ec;
+}
+
+.wx-alerts-quiet { color: var(--wx-muted); }
+
+.wx-alerts-count {
+    font-weight: 700;
+    color: #92400e;
+}
+
+.wx-alerts-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wx-alert {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: #fef3c6;
+    border: 1px solid #f8d38a;
+}
+
+.wx-alert.is-warning { background: #fee2e1; border-color: #f9a8a3; }
+.wx-alert.is-watch { background: #fef3c6; border-color: #f8d38a; }
+
+.wx-alert-event { font-weight: 600; }
+.wx-alert-times { font-variant-numeric: tabular-nums; color: var(--wx-muted); }
+
+.wx-alert-area {
+    max-width: 22ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--wx-muted);
+}
+
+.wx-ribbon { margin-top: 0.6rem; }
+
+.wx-ribbon-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--wx-muted);
+    margin-bottom: 0.45rem;
+}
+
+.wx-ribbon-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--wx-ink);
+}
+
+.wx-ribbon-time { font-variant-numeric: tabular-nums; }
+
+.wx-ribbon-spread {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+.wx-ribbon-error { margin: 0 0 0.4rem; color: var(--wx-warm); font-size: 0.85rem; }
+
+.wx-chips {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.wx-chip {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.05rem;
+    min-width: 6.5rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 10px;
+    border: 1px solid var(--wx-line);
+    background: var(--wx-card);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.wx-chip:hover { transform: translateY(-1px); border-color: var(--wx-accent); }
+.wx-chip.is-warmest { border-color: #fbbf23; box-shadow: inset 0 -2px 0 #fbbf23; }
+.wx-chip.is-coldest { border-color: #93c4fd; box-shadow: inset 0 -2px 0 #93c4fd; }
+
+.wx-chip-city {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--wx-muted);
+}
+
+.wx-chip-temp {
+    font-size: 1.15rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
+.wx-chip-temp.is-missing { color: var(--wx-line); }
+
+.wx-chip-sky {
+    font-size: 0.7rem;
+    color: var(--wx-muted);
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wx-chip.is-skeleton {
+    min-width: 6.5rem;
+    height: 3.1rem;
+    background: linear-gradient(90deg, #eef2f6 25%, #f7fafc 50%, #eef2f6 75%);
+    background-size: 200% 100%;
+    animation: wx-shimmer 1.4s linear infinite;
+    border-color: transparent;
+}
+
+@keyframes wx-shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* --- layout --------------------------------------------------------------- */
+.wx-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .wx-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- search --------------------------------------------------------------- */
+.wx-search {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.wx-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--wx-line);
+    background: var(--wx-card);
+    font: inherit;
+}
+
+.wx-input:focus-visible {
+    outline: 2px solid var(--wx-accent);
+    outline-offset: 1px;
+}
+
+.wx-button {
+    flex: 0 0 auto;
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    border: 1px solid var(--wx-accent);
+    background: var(--wx-accent);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wx-button:hover { filter: brightness(1.08); }
+
+.wx-suggest-wrap { position: relative; }
+
+.wx-suggestions {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    margin-top: 0.35rem;
+    background: var(--wx-card);
+    border: 1px solid var(--wx-line);
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgb(15 23 42 / 12%);
+    overflow: hidden;
+}
+
+.wx-suggestions:empty { display: none; }
+
+.wx-suggestion {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 0;
+    border-bottom: 1px solid var(--wx-line);
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.wx-suggestion:last-child { border-bottom: 0; }
+.wx-suggestion:hover { background: var(--wx-accent-soft); }
+.wx-suggestion-name { font-weight: 600; }
+.wx-suggestion-county { font-size: 0.78rem; color: var(--wx-muted); }
+.wx-suggest-empty { margin: 0; padding: 0.6rem 0.75rem; color: var(--wx-muted); }
+
+/* --- map ------------------------------------------------------------------ */
+.wx-mapfig {
+    margin: 0.75rem 0 0;
+    padding: 0.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--wx-line);
+    background: var(--wx-water);
+}
+
+.wx-map {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 62vh;
+    cursor: crosshair;
+    touch-action: manipulation;
+}
+
+.wx-map.is-busy { cursor: progress; }
+
+.wx-county {
+    fill: var(--wx-land);
+    stroke: var(--wx-land-line);
+    stroke-width: 1.1;
+    transition: fill 140ms ease;
+}
+
+.wx-county:hover { fill: #c7d5e2; }
+.wx-county.is-flagged { fill: #fbd89a; }
+.wx-county.is-flagged:hover { fill: #f7c976; }
+
+.wx-marker { pointer-events: none; }
+
+.wx-marker-halo {
+    fill: var(--wx-accent);
+    opacity: 0.18;
+    animation: wx-ping 2.2s ease-out infinite;
+    transform-origin: center;
+}
+
+.wx-marker-ring { fill: none; stroke: #fff; stroke-width: 2.5; }
+.wx-marker-dot { fill: var(--wx-accent); }
+
+@keyframes wx-ping {
+    0% { transform: scale(0.55); opacity: 0.35; }
+    70% { transform: scale(1.25); opacity: 0.05; }
+    100% { transform: scale(1.25); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wx-marker-halo,
+    .wx-chip.is-skeleton,
+    .wx-pulse { animation: none; }
+}
+
+.wx-mapnote {
+    margin: 0.4rem 0.25rem 0.1rem;
+    font-size: 0.72rem;
+    color: var(--wx-muted);
+}
+
+.wx-swatch {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    background: #fbd89a;
+    vertical-align: -0.05rem;
+}
+
+/* --- point panel ---------------------------------------------------------- */
+.wx-point {
+    background: var(--wx-card);
+    border: 1px solid var(--wx-line);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.wx-point.is-loading,
+.wx-alerts.is-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--wx-muted);
+}
+
+.wx-pulse {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--wx-accent);
+    animation: wx-blink 1.3s ease-in-out infinite;
+    flex: 0 0 auto;
+}
+
+.wx-pulse.is-live { background: #16a349; }
+
+@keyframes wx-blink {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+}
+
+.wx-place {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 650;
+}
+
+.wx-where {
+    margin: 0.15rem 0 0;
+    font-size: 0.8rem;
+    color: var(--wx-muted);
+}
+
+.wx-latlon { font-variant-numeric: tabular-nums; }
+.wx-dot { margin: 0 0.35rem; }
+
+.wx-error {
+    margin: 0.9rem 0 0;
+    padding: 0.7rem 0.85rem;
+    border-radius: 10px;
+    background: var(--wx-accent-soft);
+    border: 1px solid #bcdcee;
+}
+
+.wx-error.is-outside { background: #f1f5f9; border-color: var(--wx-line); }
+
+.wx-now {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: 0.75rem;
+}
+
+.wx-now-temp {
+    font-size: 3.1rem;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.wx-now-temp.is-missing { color: var(--wx-line); }
+.wx-now-summary { margin: 0; font-weight: 600; }
+.wx-now-station { margin: 0.1rem 0 0; font-size: 0.75rem; color: var(--wx-muted); }
+
+.wx-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+    gap: 0.5rem;
+    margin: 0.9rem 0 0;
+    padding: 0.75rem 0 0;
+    border-top: 1px solid var(--wx-line);
+}
+
+.wx-facts dt {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--wx-muted);
+    font-weight: 600;
+}
+
+.wx-facts dd {
+    margin: 0.1rem 0 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.wx-compass {
+    margin-left: 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--wx-muted);
+}
+
+.wx-point-alerts {
+    list-style: none;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.wx-point-alert {
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    background: #fef3c6;
+    border-left: 3px solid var(--wx-flag);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.wx-point-alert.is-warning { background: #fee2e1; border-left-color: #dc2625; }
+.wx-until { color: var(--wx-muted); font-size: 0.78rem; }
+
+.wx-trend { margin-top: 1rem; }
+
+.wx-trend-head,
+.wx-trend-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--wx-muted);
+}
+
+.wx-trend-head { margin-bottom: 0.2rem; }
+.wx-trend-range { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--wx-ink); }
+
+.wx-spark {
+    display: block;
+    width: 100%;
+    height: 4rem;
+    overflow: visible;
+}
+
+.wx-spark-fill { fill: var(--wx-accent); opacity: 0.12; }
+
+.wx-spark-line {
+    fill: none;
+    stroke: var(--wx-accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.wx-periods {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0.75rem 0 0;
+    border-top: 1px solid var(--wx-line);
+    display: grid;
+    gap: 0.5rem;
+}
+
+.wx-period {
+    padding: 0.5rem 0.65rem;
+    border-radius: 10px;
+    background: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+}
+
+.wx-period.is-day { border-left-color: #fbbf23; }
+.wx-period.is-night { border-left-color: #6366f1; }
+
+.wx-period-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.wx-period-name { font-weight: 650; }
+.wx-period-temp { font-size: 1.05rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.wx-period-short { margin: 0.1rem 0 0; }
+
+.wx-period-meta {
+    margin: 0.15rem 0 0;
+    font-size: 0.73rem;
+    color: var(--wx-muted);
+    display: flex;
+    gap: 0.6rem;
+}
+
+.wx-precip { color: var(--wx-cold); font-weight: 600; }
+
+.wx-point-foot {
+    margin: 0.9rem 0 0;
+    font-size: 0.7rem;
+    color: var(--wx-muted);
+}
+
+.wx-foot {
+    margin-top: 1rem;
+    padding: 0.75rem 0.25rem;
+    border-top: 1px solid var(--wx-line);
+    font-size: 0.75rem;
+    color: var(--wx-muted);
+}
+
+.wx-foot a { color: var(--wx-accent); }

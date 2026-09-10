@@ -1,0 +1,132 @@
+@page
+@using JobBoard.Helpers
+@model WeatherModel
+@{
+    ViewData["Title"] = "Wisconsin Weather";
+    var map = Model.Geography.Map;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/weather.css" asp-append-version="true" />
+}
+
+<div id="wx" class="wx"
+     data-signals:lat="@ViewHelpers.Js(WeatherModel.DefaultPoint.Latitude)"
+     data-signals:lon="@ViewHelpers.Js(WeatherModel.DefaultPoint.Longitude)"
+     data-signals:label="@ViewHelpers.Js(Model.StartLabel)"
+     data-signals:query="''"
+     data-signals:celsius="false"
+     data-signals:alert-fips="''"
+     data-class:units-c="$celsius"
+     data-init="@@get('/Weather?handler=Point')">
+
+    <header class="wx-head">
+        <div>
+            <h1 class="wx-title">Wisconsin Weather</h1>
+            <p class="wx-sub">
+                Click anywhere in the state. Every one of the 72 counties, all 756 named places, and
+                whatever empty stretch of Chequamegon forest you point at in between.
+            </p>
+        </div>
+        <div class="wx-head-right">
+            <div class="wx-coords" aria-live="off">
+                <span class="wx-coords-label">Selected</span>
+                <span class="wx-coords-value" data-text="wiFormatPoint($lat, $lon)"></span>
+            </div>
+            <div class="wx-units" role="group" aria-label="Temperature units">
+                <button type="button" data-on:click="$celsius = false" data-class:on="!$celsius">&deg;F</button>
+                <button type="button" data-on:click="$celsius = true" data-class:on="$celsius">&deg;C</button>
+            </div>
+        </div>
+    </header>
+
+    @* This wrapper opens the long-lived stream. It is never itself patched, so the stream is
+       started exactly once per page load. *@
+    <section class="wx-live" data-init="@@get('/Weather?handler=Live')">
+        <div id="wx-alerts" class="wx-alerts is-loading" aria-live="polite">
+            <span class="wx-pulse" aria-hidden="true"></span>
+            Checking for active watches and warnings&hellip;
+        </div>
+
+        <div id="wx-ribbon" class="wx-ribbon" aria-live="polite">
+            <div class="wx-chips">
+                @for (var i = 0; i < 10; i++)
+                {
+                    <div class="wx-chip is-skeleton" aria-hidden="true"></div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <div class="wx-grid">
+        <div class="wx-mapcol">
+            <div class="wx-search">
+                <label class="wx-visually-hidden" for="wx-query">Search Wisconsin places</label>
+                <input id="wx-query" type="search" autocomplete="off" spellcheck="false"
+                       class="wx-input" placeholder="Search a city, village or county&hellip;"
+                       data-bind:query
+                       data-indicator="busy"
+                       data-on:input__debounce.250ms="@@get('/Weather?handler=Search')" />
+                <button type="button" class="wx-button"
+                        data-indicator="busy"
+                        data-on:click="$query = ''; @@get('/Weather?handler=Random')">
+                    Surprise me
+                </button>
+            </div>
+
+            @* Hiding the list on an empty query means clearing the box dismisses it with no round trip. *@
+            <div class="wx-suggest-wrap" data-show="($query || '').length > 0">
+                <div id="wx-suggestions" class="wx-suggestions"></div>
+            </div>
+
+            <figure class="wx-mapfig">
+                <svg class="wx-map" viewBox="@map.ViewBox" role="img" preserveAspectRatio="xMidYMid meet"
+                     aria-label="Map of Wisconsin's 72 counties. Click any point for its forecast; the search box above does the same thing from the keyboard."
+                     data-indicator="busy"
+                     data-class:is-busy="$busy"
+                     data-on:click="const p = wiMapPoint(evt, el); $lat = p.lat; $lon = p.lon; $label = ''; $query = ''; @@get('/Weather?handler=Point')">
+                    <g class="wx-counties">
+                        @foreach (var county in Model.Geography.Counties)
+                        {
+                            @* $alertFips arrives on the alert banner every time the live stream
+                               refreshes, so the map re-colours itself with no extra request. *@
+                            <path class="wx-county" d="@Model.Geography.PathFor(county)"
+                                  data-class:is-flagged="($alertFips || '').includes(',@(county.Fips),')">
+                                <title>@county.Name County</title>
+                            </path>
+                        }
+                    </g>
+                    <g class="wx-marker" data-attr:transform="wiMarkerTransform($lat, $lon)">
+                        <circle class="wx-marker-halo" r="16"></circle>
+                        <circle class="wx-marker-ring" r="9"></circle>
+                        <circle class="wx-marker-dot" r="3.5"></circle>
+                    </g>
+                </svg>
+                <figcaption class="wx-mapnote">
+                    County outlines from US Census cartographic boundaries. Counties shaded
+                    <span class="wx-swatch" aria-hidden="true"></span> have an active NWS alert.
+                </figcaption>
+            </figure>
+        </div>
+
+        <div id="wx-point" class="wx-point is-loading">
+            <span class="wx-pulse" aria-hidden="true"></span>
+            Reading the forecast for the State Capitol&hellip;
+        </div>
+    </div>
+
+    <footer class="wx-foot">
+        Forecasts, observations and alerts from the
+        <a href="https://www.weather.gov/documentation/services-web-api" rel="noopener">National Weather Service API</a>.
+        Rendered on the server and pushed to this page over server-sent events by
+        <a href="https://data-star.dev" rel="noopener">Datastar</a> &mdash; there is no client-side
+        weather code on this page beyond the map's projection.
+    </footer>
+</div>
+
+@section Scripts {
+    <script>
+        window.wisconsinMap = @Html.Raw(Model.MapConfigJson);
+    </script>
+    <script src="~/js/wisconsin-map.js" asp-append-version="true"></script>
+}

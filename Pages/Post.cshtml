@@ -6,7 +6,8 @@
 
 <div class="container mt-5">
     <h1>Post a New Job</h1>
-    <div id="post-form-container" data-store="{ title: '', company: '', location: '', description: '', type: 'Full-time', salaryRange: '' }">
+    @* The form posts its own fields (contentType: 'form'), so this page needs no signals. *@
+    <div id="post-form-container">
         <form id="post-form" data-on:submit="@@post('/Post?handler=Submit', {contentType:'form'})" >
         @Html.AntiForgeryToken()
             <div class="mb-3">

@@ -1,4 +1,4 @@
-using JobBoard.Helpers;
+using System.Text.Json.Serialization;
 using JobBoard.Models;
 using JobBoard.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,42 +24,38 @@ namespace JobBoard.Pages
 
         public IEnumerable<Job> Jobs { get; set; } = new List<Job>();
 
-        [BindProperty(SupportsGet = true)]
-        public string Query { get; set; } = string.Empty;
-
         public void OnGet()
         {
             Jobs = _jobService.GetAll();
         }
 
-        public async Task<IActionResult> OnGetSearchAsync()
+        public async Task<IActionResult> OnGetSearchAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Search query: {Query}", Query);
-            foreach (var key in Request.Query.Keys)
-            {
-                _logger.LogInformation("Query Key: {Key}, Value: {Value}", key, Request.Query[key]);
-            }
-            // Check for Datastar store in headers or params
-            // Usually it might be in 'datastar' param
-            if (Request.Query.ContainsKey("datastar"))
-            {
-                Query = "DevOps";
-                _logger.LogInformation("Datastar param found: {Value}", Request.Query["datastar"]);
-            }
+            // Datastar sends every signal up as one JSON payload rather than as ordinary query
+            // values, so the search term is read from the signals, not from model binding.
+            var signals = await _dataStarService.ReadSignalsAsync<SearchSignals>(cancellationToken);
+            var query = signals?.Query?.Trim() ?? string.Empty;
+
+            _logger.LogInformation("Job search: {Query}", query);
+
             var jobs = _jobService.GetAll();
-            if (!string.IsNullOrWhiteSpace(Query))
+            if (!string.IsNullOrWhiteSpace(query))
             {
-                jobs = jobs.Where(j => 
-                    j.Title.Contains(Query, StringComparison.OrdinalIgnoreCase) || 
-                    j.Company.Contains(Query, StringComparison.OrdinalIgnoreCase) ||
-                    j.Location.Contains(Query, StringComparison.OrdinalIgnoreCase));
+                jobs = jobs.Where(job =>
+                    job.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    job.Company.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    job.Location.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
             var html = await _renderer.RenderViewToStringAsync("_JobList", jobs, PageContext);
-            
-            await _dataStarService.PatchElementsAsync(html);
-            // SendMergeFragments(html, selector: "#job-list");
+            await _dataStarService.PatchElementsAsync(html, cancellationToken);
             return new EmptyResult();
+        }
+
+        public record SearchSignals
+        {
+            [JsonPropertyName("query")]
+            public string? Query { get; init; }
         }
     }
 }
