@@ -1,5 +1,3 @@
 initialize: 
-	curl -fsSL https://opencode.ai/install | bash
-	dotnet restore ${PWD}
-	dotnet build
-	dotnet dev-certs https --trust
+	dotnet restore ${PWD}/datastar.sln
+	dotnet build ${PWD}/datastar.sln
